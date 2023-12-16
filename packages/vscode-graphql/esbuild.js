@@ -13,8 +13,10 @@ build({
   outdir: 'out/',
   format: 'cjs',
   sourcemap: true,
-  // Avoid bundling @vue/compiler-sfc's dynamic dependencies
   external: [
+    // Avoid bundling @astrojs/compiler since esbuild can't handle WASM correctly
+    '@astrojs/compiler',
+    'astrojs-compiler-sync',
     'squirrelly',
     'teacup',
     'coffee-script',
