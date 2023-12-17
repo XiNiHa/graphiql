@@ -1,6 +1,6 @@
 {
   "name": "vscode-graphql",
-  "version": "0.8.25",
+  "version": "0.8.25-astro.0",
   "private": true,
   "license": "MIT",
   "displayName": "GraphQL: Language Feature Support",

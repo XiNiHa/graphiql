@@ -1,0 +1,134 @@
+diff --git a/node_modules/@graphql-tools/graphql-tag-pluck/cjs/index.js b/node_modules/@graphql-tools/graphql-tag-pluck/cjs/index.js
+index 6a9983c..ca0da21 100644
+--- a/node_modules/@graphql-tools/graphql-tag-pluck/cjs/index.js
++++ b/node_modules/@graphql-tools/graphql-tag-pluck/cjs/index.js
+@@ -27,6 +27,7 @@ const supportedExtensions = [
+     '.flow.jsx',
+     '.vue',
+     '.svelte',
++    '.astro',
+ ];
+ // tslint:disable-next-line: no-implicit-dependencies
+ function parseWithVue(vueTemplateCompiler, fileData) {
+@@ -40,6 +41,10 @@ function parseWithSvelte(svelte2tsx, fileData) {
+     const fileInTsx = svelte2tsx.svelte2tsx(fileData);
+     return fileInTsx.code;
+ }
++async function parseWithAstro(astroCompiler, fileData) {
++    const fileInTsx = await astroCompiler.transform(fileData);
++    return fileInTsx.code;
++}
+ /**
+  * Asynchronously plucks GraphQL template literals from a single file.
+  *
+@@ -58,6 +63,9 @@ const gqlPluckFromCodeString = async (filePath, code, options = {}) => {
+     else if (fileExt === '.svelte') {
+         code = await pluckSvelteFileScript(code);
+     }
++    else if (fileExt === '.astro') {
++        code = await pluckAstroFileScript(code);
++    }
+     return parseCode({ code, filePath, options }).map(t => new graphql_1.Source(t.content, filePath, t.loc.start));
+ };
+ exports.gqlPluckFromCodeString = gqlPluckFromCodeString;
+@@ -131,6 +139,18 @@ const MissingSvelteTemplateCompilerError = new Error((0, utils_js_1.freeText)(`
+ 
+         $ yarn add svelte2tsx svelte
+   `));
++const MissingAstroTemplateCompilerError = new Error((0, utils_js_1.freeText)(`
++    GraphQL template literals cannot be plucked from a Astro template code without having the "@astrojs/compiler" package installed.
++    Please install it and try again.
++
++    Via NPM:
++
++        $ npm install @astrojs/compiler
++
++    Via Yarn:
++
++        $ yarn add @astrojs/compiler
++  `));
+ async function pluckVueFileScript(fileData) {
+     let vueTemplateCompiler;
+     try {
+@@ -175,3 +195,14 @@ function pluckSvelteFileScriptSync(fileData) {
+     }
+     return parseWithSvelte(svelte2tsx, fileData);
+ }
++async function pluckAstroFileScript(fileData) {
++    let astroCompiler;
++    try {
++        // eslint-disable-next-line import/no-extraneous-dependencies
++        astroCompiler = await Promise.resolve().then(() => tslib_1.__importStar(require('@astrojs/compiler')));
++    }
++    catch (e) {
++        throw MissingAstroTemplateCompilerError;
++    }
++    return parseWithAstro(astroCompiler, fileData);
++}
+diff --git a/node_modules/@graphql-tools/graphql-tag-pluck/esm/index.js b/node_modules/@graphql-tools/graphql-tag-pluck/esm/index.js
+index ef74bb9..490a77a 100644
+--- a/node_modules/@graphql-tools/graphql-tag-pluck/esm/index.js
++++ b/node_modules/@graphql-tools/graphql-tag-pluck/esm/index.js
+@@ -23,6 +23,7 @@ const supportedExtensions = [
+     '.flow.jsx',
+     '.vue',
+     '.svelte',
++    '.astro',
+ ];
+ // tslint:disable-next-line: no-implicit-dependencies
+ function parseWithVue(vueTemplateCompiler, fileData) {
+@@ -36,6 +37,10 @@ function parseWithSvelte(svelte2tsx, fileData) {
+     const fileInTsx = svelte2tsx.svelte2tsx(fileData);
+     return fileInTsx.code;
+ }
++async function parseWithAstro(astroCompiler, fileData) {
++    const fileInTsx = await astroCompiler.transform(fileData);
++    return fileInTsx.code;
++}
+ /**
+  * Asynchronously plucks GraphQL template literals from a single file.
+  *
+@@ -54,6 +59,9 @@ export const gqlPluckFromCodeString = async (filePath, code, options = {}) => {
+     else if (fileExt === '.svelte') {
+         code = await pluckSvelteFileScript(code);
+     }
++    else if (fileExt === '.astro') {
++        code = await pluckAstroFileScript(code);
++    }
+     return parseCode({ code, filePath, options }).map(t => new Source(t.content, filePath, t.loc.start));
+ };
+ /**
+@@ -124,6 +132,18 @@ const MissingSvelteTemplateCompilerError = new Error(freeText(`
+ 
+         $ yarn add svelte2tsx svelte
+   `));
++const MissingAstroTemplateCompilerError = new Error(freeText(`
++    GraphQL template literals cannot be plucked from a Astro template code without having the "@astrojs/compiler" package installed.
++    Please install it and try again.
++
++    Via NPM:
++
++        $ npm install @astrojs/compiler
++
++    Via Yarn:
++
++        $ yarn add @astrojs/compiler
++  `));
+ async function pluckVueFileScript(fileData) {
+     let vueTemplateCompiler;
+     try {
+@@ -168,3 +188,14 @@ function pluckSvelteFileScriptSync(fileData) {
+     }
+     return parseWithSvelte(svelte2tsx, fileData);
+ }
++async function pluckAstroFileScript(fileData) {
++    let astroCompiler;
++    try {
++        // eslint-disable-next-line import/no-extraneous-dependencies
++        astroCompiler = await Promise.resolve().then(() => tslib_1.__importStar(require('@astrojs/compiler')));
++    }
++    catch (e) {
++        throw MissingAstroTemplateCompilerError;
++    }
++    return parseWithAstro(astroCompiler, fileData);
++}
