@@ -11,3 +11,7 @@ renovate.json
 *.tsbuildinfo
 esbuild.js
 dist/**
+../../node_modules/**
+!../../node_modules/@astrojs/compiler
+!../../node_modules/astrojs-compiler-sync
+!../../node_modules/@pkgr/core
